@@ -7,31 +7,10 @@ module ShippingAgent
 
     def to_unit
       {
-        "Unit" => {
-        "Description" => name,
-        "After" => "docker.service",
-        "Requires" => "docker.service",
-      },
-      "Service" => {
-        "User" => "root",
-        "ExecStartPre" => [
-          "/usr/bin/docker run --rm -v /opt/bin:/opt/bin ibuildthecloud/systemd-docker",
-          "/usr/bin/docker pull #{image}",
-        ],
-        "ExecStart" => "/opt/bin/systemd-docker run -P --rm --name #{name}-%i #{formated_env} #{image}",
-        "Restart" => "always",
-        "RestartSec" => "10s",
-        "Type" => "notify",
-        "NotifyAccess" => "all",
-        "TimeoutStartSec" => "240",
-        "TimeoutStopSec" => "15",
-      },
-      "Install" => {
-        "WantedBy" => "multi-user.target",
-      },
-      "X-Fleet" => {
-        "Conflicts" => "#{name}@*.service",
-      }
+        'Unit' => unit,
+        'Service' => service,
+        'Install' => { 'WantedBy' => 'multi-user.target' },
+        'X-Fleet' => { 'Conflicts' => "#{name}@*.service" },
       }
     end
 
@@ -40,8 +19,39 @@ module ShippingAgent
     attr_accessor :build, :env
 
     private
+
+    def unit
+      {
+        'Description' => name,
+        'After' => 'docker.service',
+        'Requires' => 'docker.service',
+      }
+    end
+
+    def service
+      {
+        'ExecStartPre' => [
+          '/usr/bin/docker run --rm -v /opt/bin:/opt/bin ibuildthecloud/systemd-docker',
+          "/usr/bin/docker pull #{image}",
+        ],
+        'ExecStart' => "/opt/bin/systemd-docker run -P --rm --name #{name}-%i #{formated_env} #{image}",
+      }.merge(service_defaults)
+    end
+
+    def service_defaults
+      {
+        'User' => 'root',
+        'Restart' => 'always',
+        'RestartSec' => '10s',
+        'Type' => 'notify',
+        'NotifyAccess' => 'all',
+        'TimeoutStartSec' => '240',
+        'TimeoutStopSec' => '15',
+      }
+    end
+
     def formated_env
-      env.map { |k,v| "-e #{k}=#{v}" }.join(" ")
+      env.map { |k, v| "-e #{k}=#{v}" }.join(' ')
     end
 
     def image
