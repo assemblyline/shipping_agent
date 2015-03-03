@@ -15,9 +15,19 @@ module ShippingAgent
 
     def submit
       build.processes.each do |process|
-        fleet.submit(name(process) + '@.service', to_unit(process))
-        fleet.submit(name(process) + '_sidekick@.service', to_sidekick(process)) if process.exposes_port?
+        submit_unit(to_unit(process))
+        submit_unit(to_sidekick(process)) if process.exposes_port?
       end
+    end
+
+    protected
+
+    attr_writer :build, :tag, :env
+
+    private
+
+    def submit_unit(unit)
+      fleet.submit(unit.name + '@.service', unit.to_hash)
     end
 
     def to_unit(process)
@@ -26,7 +36,7 @@ module ShippingAgent
         image: image,
         process: process,
         env: env,
-      ).to_hash
+      )
     end
 
     def to_sidekick(process)
@@ -35,14 +45,8 @@ module ShippingAgent
         image: 'quay.io/assemblyline/sidekicks',
         process: Process.new(name: 'vulcand', command: 'vulcand'),
         env: {},
-      ).to_hash
+      )
     end
-
-    protected
-
-    attr_writer :build, :tag, :env
-
-    private
 
     def fleet
       Fleet.new

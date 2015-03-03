@@ -8,6 +8,8 @@ module ShippingAgent
       @env = env
     end
 
+    attr_reader :name
+
     def to_hash
       {
         'Unit' => unit,
@@ -19,7 +21,7 @@ module ShippingAgent
 
     private
 
-    attr_reader :image, :env, :process, :name
+    attr_reader :image, :env, :process
 
 
     def unit
