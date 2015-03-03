@@ -21,6 +21,7 @@ describe ShippingAgent::Release do
 
     before do
       allow(Fleet).to receive(:new).and_return(fleet)
+      allow(fleet).to receive(:submit)
     end
 
     it 'submits the unit to fleet' do
@@ -42,6 +43,28 @@ describe ShippingAgent::Release do
         'X-Fleet' => { 'Conflicts' => 'awesome_0.0.1_e37496243_web@*.service' },
       }
       expect(fleet).to receive(:submit).with('awesome_0.0.1_e37496243_web@.service', expected_unit)
+      release.submit
+    end
+
+    it 'submits a sidekick unit to fleet' do
+      expected_sidekick = {
+        'Unit' =>         { 'Description' => 'awesome_0.0.1_e37496243_web_sidekick',
+                            'After' => 'docker.service',
+                            'Requires' => 'docker.service' },
+        'Service' =>         { 'User' => 'root',
+                               'ExecStartPre' => ['/usr/bin/docker run --rm -v /opt/bin:/opt/bin ibuildthecloud/systemd-docker', # rubocop:disable Metrics/LineLength
+                                                  '/usr/bin/docker pull quay.io/assemblyline/sidekicks'],
+                               'ExecStart' => '/opt/bin/systemd-docker run -P --rm --name awesome_0.0.1_e37496243_web_sidekick-%i  quay.io/assemblyline/sidekicks vulcand', # rubocop:disable Metrics/LineLength
+                               'Restart' => 'always',
+                               'RestartSec' => '10s',
+                               'Type' => 'notify',
+                               'NotifyAccess' => 'all',
+                               'TimeoutStartSec' => '240',
+                               'TimeoutStopSec' => '15' },
+        'Install' => { 'WantedBy' => 'multi-user.target' },
+        'X-Fleet' => { 'Conflicts' => 'awesome_0.0.1_e37496243_web_sidekick@*.service' },
+      }
+      expect(fleet).to receive(:submit).with('awesome_0.0.1_e37496243_web_sidekick@.service', expected_sidekick)
       release.submit
     end
 

@@ -1,4 +1,5 @@
 require 'shipping_agent/unit'
+require 'shipping_agent/process'
 require 'fleet'
 require 'digest'
 
@@ -15,6 +16,7 @@ module ShippingAgent
     def submit
       build.processes.each do |process|
         fleet.submit(name(process) + '@.service', to_unit(process))
+        fleet.submit(name(process) + '_sidekick@.service', to_sidekick(process))
       end
     end
 
@@ -24,6 +26,15 @@ module ShippingAgent
         image: image,
         process: process,
         env: env,
+      ).to_hash
+    end
+
+    def to_sidekick(process)
+      Unit.new(
+        name: name(process) + '_sidekick',
+        image: 'quay.io/assemblyline/sidekicks',
+        process: Process.new(name: 'vulcand', command: 'vulcand'),
+        env: {},
       ).to_hash
     end
 

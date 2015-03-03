@@ -35,10 +35,14 @@ describe ShippingAgent::ApplicationRepository do
     expect(build.processes.first.command).to eq 'bin/puma'
     expect(application.releases).to eq []
 
-    expect(fleet).to receive(:submit) do |name, unit|
+    expect(fleet).to receive(:submit).once do |name, unit|
       expect(name).to eq 'todo-app_v1_e27982344_web@.service'
       expect(unit['Service']['ExecStart']).to include('bin/puma')
       expect(unit['Service']['ExecStart']).to include('-e RACK_ENV=production')
+    end
+
+    expect(fleet).to receive(:submit).once do |name, _|
+      expect(name).to eq 'todo-app_v1_e27982344_web_sidekick@.service'
     end
 
     application.release(build_tag: 'v1', env: { 'RACK_ENV' => 'production' })
@@ -53,13 +57,18 @@ describe ShippingAgent::ApplicationRepository do
     expect(release.build.tag).to eq build.tag
     expect(release.env).to eq('RACK_ENV' => 'production')
 
-    expect(fleet).to receive(:submit) do |name, unit|
+    expect(fleet).to receive(:submit).once do |name, unit|
       expect(name).to eq 'todo-app_v1_124048c26_web@.service'
       expect(unit['Service']['ExecStart']).to include('bin/puma')
       expect(unit['Service']['ExecStart']).to include(
         '-e DATABASE_URL=postgres://user:pass@database.example.com/todos',
       )
     end
+
+    expect(fleet).to receive(:submit).once do |name, _|
+      expect(name).to eq 'todo-app_v1_124048c26_web_sidekick@.service'
+    end
+
     application.release(
       build_tag: 'v1',
       env: { 'DATABASE_URL' => 'postgres://user:pass@database.example.com/todos', 'RACK_ENV' => 'production' },
