@@ -19,10 +19,12 @@ module ShippingAgent
     end
 
     def release(build_tag:, env:)
-      releases << Release.new(
+      release =  Release.new(
         build: build_for(build_tag),
         env: env,
       )
+      release.submit
+      releases << release
     end
 
     def build_for(tag)

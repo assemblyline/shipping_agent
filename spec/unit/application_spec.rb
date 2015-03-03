@@ -34,25 +34,40 @@ describe ShippingAgent::Application do
 
   describe '#release' do
     context 'happy path' do
+      let(:fleet) { double(:fleet_client, submit: true) }
+
       before do
+        allow(Fleet).to receive(:new).and_return(fleet)
+      end
+
+      def do_release
         subject.register_build(tag: 'v1', procfile: 'web: bin/puma')
         subject.release(build_tag: 'v1', env: { 'RACK_ENV' => 'production' })
       end
 
       it 'creates a new release' do
+        do_release
         expect(subject.releases.size).to eq 1
       end
 
       it 'is a Release' do
+        do_release
         expect(subject.releases.first).to be_a ShippingAgent::Release
       end
 
       it 'gets a generated tag' do
+        do_release
         expect(subject.releases.first.tag).to eq 'cc412b93cd651ba1db383b5f236282716df22c04'
       end
 
       it 'has the correct build' do
+        do_release
         expect(subject.releases.first.build).to eq subject.builds.first
+      end
+
+      it 'submits the build to fleet' do
+        expect(fleet).to receive(:submit)
+        do_release
       end
     end
 

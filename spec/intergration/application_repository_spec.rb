@@ -2,8 +2,10 @@ require 'spec_helper'
 require 'shipping_agent/application_repository'
 
 describe ShippingAgent::ApplicationRepository do
-  after do
-    described_class.etcd.delete('/assemblyline/', recursive: true)
+  let(:fleet) { double(:fleet_client) }
+
+  before do
+    allow(Fleet).to receive(:new).and_return(fleet)
   end
 
   it 'works as expected' do
@@ -33,6 +35,12 @@ describe ShippingAgent::ApplicationRepository do
     expect(build.processes.first.command).to eq 'bin/puma'
     expect(application.releases).to eq []
 
+    expect(fleet).to receive(:submit) do |name, unit|
+      expect(name).to eq 'todo-app_v1_e27982344_web@.service'
+      expect(unit['Service']['ExecStart']).to include('bin/puma')
+      expect(unit['Service']['ExecStart']).to include('-e RACK_ENV=production')
+    end
+
     application.release(build_tag: 'v1', env: { 'RACK_ENV' => 'production' })
     release_tag = application.releases.first.tag
     ShippingAgent::ApplicationRepository.save(application)
@@ -45,6 +53,16 @@ describe ShippingAgent::ApplicationRepository do
     expect(release.build.tag).to eq build.tag
     expect(release.env).to eq('RACK_ENV' => 'production')
 
-    application.release(build_tag: 'v1', env: { 'RACK_ENV' => 'production' })
+    expect(fleet).to receive(:submit) do |name, unit|
+      expect(name).to eq 'todo-app_v1_124048c26_web@.service'
+      expect(unit['Service']['ExecStart']).to include('bin/puma')
+      expect(unit['Service']['ExecStart']).to include(
+        '-e DATABASE_URL=postgres://user:pass@database.example.com/todos',
+      )
+    end
+    application.release(
+      build_tag: 'v1',
+      env: { 'DATABASE_URL' => 'postgres://user:pass@database.example.com/todos', 'RACK_ENV' => 'production' },
+    )
   end
 end
