@@ -5,6 +5,10 @@ module ShippingAgent
       @command = command
     end
 
+    def exposes_port?
+      %w(api web).any? { |type| name.downcase.include? type }
+    end
+
     attr_reader :name, :command
   end
 end

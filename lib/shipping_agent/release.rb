@@ -16,7 +16,7 @@ module ShippingAgent
     def submit
       build.processes.each do |process|
         fleet.submit(name(process) + '@.service', to_unit(process))
-        fleet.submit(name(process) + '_sidekick@.service', to_sidekick(process)) if process.name == 'web'
+        fleet.submit(name(process) + '_sidekick@.service', to_sidekick(process)) if process.exposes_port?
       end
     end
 

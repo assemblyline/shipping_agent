@@ -8,4 +8,33 @@ describe ShippingAgent::Process do
     expect(subject.name).to eq 'foo'
     expect(subject.command).to eq 'bundle exec rake foo'
   end
+
+  describe '#exposes_port?' do
+
+    it 'exposes port if the name is web' do
+      expect(process('web').exposes_port?).to be_truthy
+    end
+
+    it 'exposes port if the name includes web' do
+      expect(process('awesome_web-service').exposes_port?).to be_truthy
+    end
+
+    it 'exposes port if the name is api' do
+      expect(process('api').exposes_port?).to be_truthy
+    end
+
+    it 'exposes port if the name includes api (case insensitive)' do
+      expect(process('the deprecatied V2 API').exposes_port?).to be_truthy
+    end
+
+    it 'does not expose port if the name is something else' do
+      expect(process('worker').exposes_port?).to be_falsey
+      expect(process('pirate').exposes_port?).to be_falsey
+      expect(process('service').exposes_port?).to be_falsey
+    end
+
+    def process(name)
+      described_class.new(name: name, command: 'whatever')
+    end
+  end
 end
