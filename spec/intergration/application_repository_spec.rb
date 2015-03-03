@@ -2,7 +2,7 @@ require 'spec_helper'
 require 'shipping_agent/application_repository'
 
 describe ShippingAgent::ApplicationRepository do
-  before do
+  after do
     described_class.etcd.delete('/assemblyline/', recursive: true)
   end
 

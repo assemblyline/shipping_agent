@@ -10,7 +10,7 @@ module ShippingAgent
     extend self
 
     def etcd
-      Etcd.client(host: '192.168.59.103')
+      Etcd.client(host: ENV['ETCD_HOST'])
     end
 
     def save(application)

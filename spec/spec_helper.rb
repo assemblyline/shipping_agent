@@ -7,5 +7,6 @@ SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[
 ]
 
 SimpleCov.start do
+  add_filter '/vendor/'
   minimum_coverage 100
 end
