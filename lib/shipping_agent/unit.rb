@@ -19,11 +19,8 @@ module ShippingAgent
 
     private
 
-    attr_reader :image, :env, :process
+    attr_reader :image, :env, :process, :name
 
-    def name
-      "#{@name}_#{process.name}"
-    end
 
     def unit
       {

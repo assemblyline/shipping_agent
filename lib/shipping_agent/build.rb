@@ -10,10 +10,6 @@ module ShippingAgent
 
     attr_reader :application, :procfile, :tag
 
-    def process(name)
-      processes.detect { |p| p.name == name }
-    end
-
     def processes
       Procfile.new(procfile).processes
     end

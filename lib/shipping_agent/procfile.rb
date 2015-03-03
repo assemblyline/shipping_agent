@@ -6,12 +6,6 @@ module ShippingAgent
       @entries = parse(procfile_string)
     end
 
-    def entries
-      @entries.each do |(name, command)|
-        yield name, command
-      end
-    end
-
     def processes
       @entries.map do |name, command|
         Process.new(name: name, command: command)

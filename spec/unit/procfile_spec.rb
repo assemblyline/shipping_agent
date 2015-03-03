@@ -24,15 +24,4 @@ describe ShippingAgent::Procfile do
       expect(subject.processes.last.command).to eq 'bin/bar -c config/config.yml'
     end
   end
-
-  describe 'entries' do
-    it 'yields the name and command to the block' do
-      stuff = {}
-      subject.entries do |name, command|
-        stuff[name] = command
-      end
-
-      expect(stuff['bar']).to eq 'bin/bar -c config/config.yml'
-    end
-  end
 end

@@ -1,4 +1,5 @@
 require 'shipping_agent/unit'
+require 'fleet'
 require 'digest'
 
 module ShippingAgent
@@ -11,11 +12,17 @@ module ShippingAgent
 
     attr_reader :build, :tag, :env
 
-    def to_unit(process_name)
+    def submit
+      build.processes.each do |process|
+        fleet.submit(name(process) + '@.service', to_unit(process))
+      end
+    end
+
+    def to_unit(process)
       Unit.new(
-        name: name,
+        name: name(process),
         image: image,
-        process: build.process(process_name),
+        process: process,
         env: env,
       ).to_hash
     end
@@ -26,12 +33,16 @@ module ShippingAgent
 
     private
 
+    def fleet
+      Fleet.new
+    end
+
     def image
       build.image
     end
 
-    def name
-      "#{build.application.name}_#{build.tag}_#{tag[0..8]}"
+    def name(process)
+      "#{build.application.name}_#{build.tag}_#{tag[0..8]}_#{process.name}"
     end
 
     def generate_tag
