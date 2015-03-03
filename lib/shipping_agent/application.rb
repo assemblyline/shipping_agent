@@ -1,10 +1,34 @@
+require 'shipping_agent/build'
+require 'shipping_agent/release'
+
 module ShippingAgent
   class Application
     def initialize(name:, repo:)
-      self.name = name
-      self.repo = repo
+      self.name     = name
+      self.repo     = repo
+      self.builds   = []
+      self.releases = []
     end
 
-    attr_accessor :name, :repo
+    def register_build(tag:, procfile:)
+      builds << Build.new(
+        application: self,
+        tag: tag,
+        procfile: procfile,
+      )
+    end
+
+    def release(build_tag:, env:)
+      releases << Release.new(
+        build: build_for(build_tag),
+        env: env,
+      )
+    end
+
+    def build_for(tag)
+      builds.detect { |b| b.tag == tag } || fail('A valid build must be specified to release')
+    end
+
+    attr_accessor :name, :repo, :builds, :releases
   end
 end

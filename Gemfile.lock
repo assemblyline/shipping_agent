@@ -3,12 +3,21 @@ GEM
   specs:
     codeclimate-test-reporter (0.4.6)
       simplecov (>= 0.7.1, < 1.0.0)
+    coderay (1.1.0)
     diff-lcs (1.2.5)
     docile (1.1.5)
+    etcd (0.2.4)
+      mixlib-log
     excon (0.44.3)
     fleet-api (1.1.0)
       excon (>= 0.27.4)
+    method_source (0.8.2)
+    mixlib-log (1.6.0)
     multi_json (1.10.1)
+    pry (0.10.1)
+      coderay (~> 1.1.0)
+      method_source (~> 0.8.1)
+      slop (~> 3.4)
     rspec (3.2.0)
       rspec-core (~> 3.2.0)
       rspec-expectations (~> 3.2.0)
@@ -27,11 +36,14 @@ GEM
       multi_json (~> 1.0)
       simplecov-html (~> 0.8.0)
     simplecov-html (0.8.0)
+    slop (3.6.0)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
   codeclimate-test-reporter (~> 0.4)
+  etcd
   fleet-api
+  pry
   rspec
