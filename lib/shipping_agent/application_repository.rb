@@ -6,13 +6,14 @@ require 'etcd'
 require 'json'
 
 module ShippingAgent
+  # Responsable for saving and fetching the Application Aggregate
+  # to and from persistance (etcd)
   module ApplicationRepository
     extend self
 
-    def etcd
-      Etcd.client(host: ENV['ETCD_HOST'])
-    end
-
+    # Saves the application Aggregate to persistance
+    #
+    # @param application [ShippingAgent::Application]
     def save(application)
       etcd.set("/assemblyline/applications/#{application.name}/application", value: to_json(application))
       application.builds.each do |build|
@@ -24,6 +25,9 @@ module ShippingAgent
       true
     end
 
+    # Gets an Application from persistance using its name to lookup
+    #
+    # @param name [String]
     def get(name)
       json = JSON.parse(etcd.get(path(name, 'application')).value)
       application = Application.new(name: json['name'], repo: json['repo'])
@@ -36,6 +40,9 @@ module ShippingAgent
 
     private
 
+    def etcd
+      Etcd.client(host: ENV['ETCD_HOST'])
+    end
 
     def get_builds_for(application)
       data_map(application, 'builds') do |key|
