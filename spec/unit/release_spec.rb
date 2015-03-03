@@ -107,8 +107,12 @@ describe ShippingAgent::Release do
           'Install' => { 'WantedBy' => 'multi-user.target' },
           'X-Fleet' => { 'Conflicts' => 'awesome_0.0.1_e37496243_worker@*.service' },
         }
+
         expect(fleet).to receive(:submit).with('awesome_0.0.1_e37496243_web@.service', web_unit)
+        expect(fleet).to receive(:submit).with('awesome_0.0.1_e37496243_web_sidekick@.service', anything)
         expect(fleet).to receive(:submit).with('awesome_0.0.1_e37496243_worker@.service', worker_unit)
+        # only the processes that expose ports need sidekicks
+        expect(fleet).to_not receive(:submit).with('awesome_0.0.1_e37496243_worker_sidekick@.service', anything)
         release.submit
       end
     end
