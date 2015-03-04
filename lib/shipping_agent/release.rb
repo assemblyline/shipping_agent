@@ -6,8 +6,6 @@ require 'digest'
 module ShippingAgent
   class Release
 
-    MAGIC_PORT = '3333'
-
     def initialize(build:, env:, tag: nil)
       self.build       = build
       self.env         = env
@@ -46,7 +44,7 @@ module ShippingAgent
       Unit.new(
         name: name(process) + '_sidekick',
         image: 'quay.io/assemblyline/sidekicks',
-        process: Process.new(name: 'vulcand', command: 'vulcand'),
+        process: Process.new(name: 'vulcand-sidekick', command: 'vulcand'),
         env: sidekick_env(process),
       )
     end
@@ -54,13 +52,12 @@ module ShippingAgent
     def sidekick_env(process)
       {
         'CONTAINER_NAME' => "#{name(process)}-%i",
-        'CONTAINER_PORT' => MAGIC_PORT,
+        'CONTAINER_PORT' => process.port,
       }
     end
 
     def unit_env(process)
-      return env unless process.exposes_port?
-      env.merge('PORT' => MAGIC_PORT)
+      env.merge('PORT' => process.port)
     end
 
     def fleet

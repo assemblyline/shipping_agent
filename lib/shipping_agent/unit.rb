@@ -38,7 +38,7 @@ module ShippingAgent
           '/usr/bin/docker run --rm -v /opt/bin:/opt/bin ibuildthecloud/systemd-docker',
           "/usr/bin/docker pull #{image}",
         ],
-        'ExecStart' => "/opt/bin/systemd-docker run -P --rm --name #{name}-%i #{formated_env} #{image} #{process.command}", # rubocop:disable Metrics/LineLength
+        'ExecStart' => "/opt/bin/systemd-docker run #{port}--rm --name #{name}-%i #{formated_env} #{image} #{process.command}", # rubocop:disable Metrics/LineLength
       }.merge(service_defaults)
     end
 
@@ -55,7 +55,11 @@ module ShippingAgent
     end
 
     def formated_env
-      env.map { |k, v| "-e #{k}=#{v}" }.join(' ')
+      env.delete_if { |_, v| v.nil? }.map { |k, v| "-e #{k}=#{v}" }.join(' ')
+    end
+
+    def port
+      "-p #{process.port} " if process.exposes_port?
     end
   end
 end

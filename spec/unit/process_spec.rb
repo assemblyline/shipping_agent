@@ -33,8 +33,20 @@ describe ShippingAgent::Process do
       expect(process('service').exposes_port?).to be_falsey
     end
 
-    def process(name)
-      described_class.new(name: name, command: 'whatever')
+  end
+
+  describe '#port' do
+
+    it 'is nil when not exposing a port' do
+      expect(process('sidekick').port).to be_nil
     end
+
+    it 'is 3333 when exposing a port' do
+      expect(process('web').port).to eq 3333
+    end
+  end
+
+  def process(name)
+    described_class.new(name: name, command: 'whatever')
   end
 end
