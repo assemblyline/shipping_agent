@@ -8,6 +8,8 @@ require 'etcd'
 module EtcdHelper
   extend self
 
+  VERSION = 'v2.0.4'
+
   def start
     if @pid
       cleanup
@@ -59,7 +61,7 @@ module EtcdHelper
   end
 
   def etcd_bin
-    "etcd-v2.0.4-#{platform}-amd64/etcd"
+    "etcd-#{VERSION}-#{platform}-amd64/etcd"
   end
 
   def platform
@@ -67,7 +69,7 @@ module EtcdHelper
   end
 
   def download_url
-    "https://github.com/coreos/etcd/releases/download/v2.0.4/etcd-v2.0.4-#{platform}-amd64.#{extension}"
+    "https://github.com/coreos/etcd/releases/download/#{VERSION}/etcd-#{VERSION}-#{platform}-amd64.#{extension}"
   end
 
   def extension
