@@ -39,7 +39,7 @@ module EtcdHelper
   def download
     return if File.exist?(etcd)
     puts "downloading the etcd binary for your system: #{platform}"
-    system "curl -L #{download_url} | tar -xvf- -C #{etcd_dir} #{etcd_bin}"
+    system "curl -L #{download_url} | tar -zxvf- -C #{etcd_dir} #{etcd_bin}"
   end
 
   def etcd
