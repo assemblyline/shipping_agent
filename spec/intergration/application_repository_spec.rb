@@ -1,7 +1,7 @@
 require 'spec_helper'
 require 'shipping_agent/application_repository'
 
-describe ShippingAgent::ApplicationRepository do
+describe ShippingAgent::ApplicationRepository, :etcd do
   let(:fleet) { double(:fleet_client) }
 
   before do
