@@ -28,12 +28,20 @@ module EtcdHelper
     puts 'starting etcd server'
     @pid = fork { exec etcd }
 
+    wait_for_server
+
     at_exit do
       puts 'killing etcd'
       Process.kill('TERM', @pid)
       Process.wait
       `rm -rf default.etcd`
     end
+  end
+
+  def wait_for_server
+    TCPSocket.new 'localhost', 4001
+  rescue Errno::ECONNREFUSED
+    retry
   end
 
   def download
