@@ -48,21 +48,27 @@ describe ShippingAgent::Release do
 
     it 'submits a sidekick unit to fleet' do
       expected_sidekick = {
-        'Unit' =>         { 'Description' => 'awesome_0.0.1_e37496243_web_sidekick',
-                            'After' => 'docker.service',
-                            'Requires' => 'docker.service' },
-        'Service' =>         { 'User' => 'root',
-                               'ExecStartPre' => ['/usr/bin/docker run --rm -v /opt/bin:/opt/bin ibuildthecloud/systemd-docker', # rubocop:disable Metrics/LineLength
-                                                  '/usr/bin/docker pull quay.io/assemblyline/sidekicks'],
-                               'ExecStart' => '/opt/bin/systemd-docker run --rm --name awesome_0.0.1_e37496243_web_sidekick-%i -e CONTAINER_NAME=awesome_0.0.1_e37496243_web-%i -e CONTAINER_PORT=3333 quay.io/assemblyline/sidekicks vulcand', # rubocop:disable Metrics/LineLength
-                               'Restart' => 'always',
-                               'RestartSec' => '10s',
-                               'Type' => 'notify',
-                               'NotifyAccess' => 'all',
-                               'TimeoutStartSec' => '240',
-                               'TimeoutStopSec' => '15' },
+        'Unit' =>         {
+          'Description' => 'awesome_0.0.1_e37496243_web_sidekick',
+          'After' => 'docker.service',
+          'Requires' => 'docker.service',
+          'After' => 'awesome_0.0.1_e37496243_web@%i.service',
+          'BindsTo' => 'awesome_0.0.1_e37496243_web@%i.service',
+        },
+        'Service' =>      {
+          'User' => 'root',
+          'ExecStartPre' => ['/usr/bin/docker run --rm -v /opt/bin:/opt/bin ibuildthecloud/systemd-docker', # rubocop:disable Metrics/LineLength
+                             '/usr/bin/docker pull quay.io/assemblyline/sidekicks'],
+          'ExecStart' => '/opt/bin/systemd-docker run --rm --name awesome_0.0.1_e37496243_web_sidekick-%i -e CONTAINER_NAME=awesome_0.0.1_e37496243_web-%i -e CONTAINER_PORT=3333 quay.io/assemblyline/sidekicks vulcand', # rubocop:disable Metrics/LineLength
+          'Restart' => 'always',
+          'RestartSec' => '10s',
+          'Type' => 'notify',
+          'NotifyAccess' => 'all',
+          'TimeoutStartSec' => '240',
+          'TimeoutStopSec' => '15',
+        },
         'Install' => { 'WantedBy' => 'multi-user.target' },
-        'X-Fleet' => { 'Conflicts' => 'awesome_0.0.1_e37496243_web_sidekick@*.service' },
+        'X-Fleet' => { 'MachineOf' => 'awesome_0.0.1_e37496243_web@%i.service' },
       }
       expect(fleet).to receive(:submit).with('awesome_0.0.1_e37496243_web_sidekick@.service', expected_sidekick)
       release.submit

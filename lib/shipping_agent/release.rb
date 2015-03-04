@@ -16,8 +16,9 @@ module ShippingAgent
 
     def submit
       build.processes.each do |process|
-        submit_unit(to_unit(process))
-        submit_unit(to_sidekick(process)) if process.exposes_port?
+        unit = to_unit(process)
+        submit_unit(unit)
+        submit_unit(to_sidekick(unit, process)) if process.exposes_port?
       end
     end
 
@@ -40,12 +41,13 @@ module ShippingAgent
       )
     end
 
-    def to_sidekick(process)
+    def to_sidekick(unit, process)
       Unit.new(
         name: name(process) + '_sidekick',
         image: 'quay.io/assemblyline/sidekicks',
         process: Process.new(name: 'vulcand-sidekick', command: 'vulcand'),
         env: sidekick_env(process),
+        bind: unit,
       )
     end
 

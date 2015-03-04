@@ -1,11 +1,12 @@
 module ShippingAgent
   class Unit
 
-    def initialize(name:, image:, env:, process:)
+    def initialize(name:, image:, env:, process:, bind: nil)
       @name = name
       @image = image
       @process = process
       @env = env
+      @bind = bind
     end
 
     attr_reader :name
@@ -15,7 +16,7 @@ module ShippingAgent
         'Unit' => unit,
         'Service' => service,
         'Install' => { 'WantedBy' => 'multi-user.target' },
-        'X-Fleet' => { 'Conflicts' => "#{name}@*.service" },
+        'X-Fleet' => x_fleet,
       }
     end
 
@@ -29,7 +30,26 @@ module ShippingAgent
         'Description' => name,
         'After' => 'docker.service',
         'Requires' => 'docker.service',
-      }
+      }.merge(bind)
+    end
+
+    def bind
+      if bind?
+        {
+          'After'   => bind_service,
+          'BindsTo' => bind_service,
+        }
+      else
+        {}
+      end
+    end
+
+    def bind_service
+      "#{@bind.name}@%i.service"
+    end
+
+    def bind?
+      !@bind.nil?
     end
 
     def service
@@ -52,6 +72,11 @@ module ShippingAgent
         'TimeoutStartSec' => '240',
         'TimeoutStopSec' => '15',
       }
+    end
+
+    def x_fleet
+      return { 'MachineOf' => bind_service } if bind?
+      { 'Conflicts' => "#{name}@*.service" }
     end
 
     def formatted_env
