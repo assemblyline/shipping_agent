@@ -4,7 +4,7 @@ module ShippingAgent
   class Build
     def initialize(application:, tag: nil, procfile:)
       self.application = application
-      self.tag = tag || generate_tag
+      self.tag = tag
       self.procfile = procfile
     end
 
@@ -22,9 +22,5 @@ module ShippingAgent
 
     attr_writer :application, :procfile, :tag
 
-    private
-
-    def generate_tag
-    end
   end
 end
