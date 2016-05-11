@@ -1,6 +1,9 @@
 language: ruby
 services:
-  - docker
+- docker
 install: gem install assemblyline-cli
 script: assemblyline build .
 sudo: required
+env:
+  global:
+    secure: hbvRUyCQPcSciWP1E+RZgHX4qLl0HaqXSRrcybBA02wJTIgN9gf2VMFzVsTirKKtZ67oYAg5iDqSYWXZNvHLar4B+Xi7Cb2Rn0N3ykCWL53QQnC6ai+8NAq6M/cTty47xJ2sbih+U79n+Sa7jMRla37KYn3FjIsfApG1w9rHkMM=
