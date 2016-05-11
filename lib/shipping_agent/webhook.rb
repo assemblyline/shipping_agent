@@ -5,7 +5,8 @@ module ShippingAgent
   module Deployer
     extend self
 
-    def notify(_url)
+    def notify(url)
+      puts url
     end
   end
 
