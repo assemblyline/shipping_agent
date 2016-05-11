@@ -9,4 +9,6 @@ Shipping agent listens for Github Deployment Events on a Webhook.
 
 Config is set up with environment variables.
 
-`GITHUB_WEBHOOK_SECRET` | The webhook secret [see](https://developer.github.com/v3/repos/hooks/#create-a-hook)
+|Name                    | Description|
+|------------------------|------------|
+|`GITHUB_WEBHOOK_SECRET` | The webhook secret [see](https://developer.github.com/v3/repos/hooks/#create-a-hook) |
