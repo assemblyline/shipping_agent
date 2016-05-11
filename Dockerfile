@@ -1,6 +1,6 @@
-FROM quay.io/assemblyline/ruby:2.1.5
+FROM quay.io/assemblyline/ruby:2.3.1
 
-WORKDIR /usr/src/shipping_agent
+WORKDIR /usr/local/a10e.org/shipping_agent
 COPY Gemfile ./
 COPY Gemfile.lock ./
 
