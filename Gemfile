@@ -1,8 +1,9 @@
 source "https://rubygems.org"
 
-gem 'puma'
+gem "puma"
 
 group :test do
+  gem "pry"
   gem "rspec"
   gem "rack-test"
   gem "rake"
