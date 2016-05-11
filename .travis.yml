@@ -2,5 +2,5 @@ language: ruby
 services:
 - docker
 install: gem install assemblyline-cli
-script: assemblyline build .
+script: assemblyline build . --push
 sudo: required
