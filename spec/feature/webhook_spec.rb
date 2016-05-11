@@ -41,11 +41,27 @@ RSpec.describe ShippingAgent::Webhook do
         expect(ShippingAgent::Deployer).to_not receive(:notify)
         post "/", body
       end
+
+      context "ping" do
+        it "returns 200" do
+          header "X-GitHub-Event", "ping"
+          post "/", body
+          expect(last_response).to be_unauthorized
+        end
+      end
     end
 
     context "the request is authorized" do
       before do
         header "X-Hub-Signature", "sha1=" + OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new("sha1"), secret, body)
+      end
+
+      context "ping" do
+        it "returns 200" do
+          header "X-GitHub-Event", "ping"
+          post "/", body
+          expect(last_response).to be_ok
+        end
       end
 
       context "without a deployment event" do

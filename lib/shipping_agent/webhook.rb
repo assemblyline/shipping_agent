@@ -25,18 +25,29 @@ module ShippingAgent
     def handle_hook(env)
       body = env["rack.input"].read
       return "401" unless authorized?(signature: env["HTTP_X_HUB_SIGNATURE"], body: body)
-      return "400" unless env["HTTP_X_GITHUB_EVENT"]
-      return "422" unless env["HTTP_X_GITHUB_EVENT"] == "deployment"
-      url = url(body)
-      return "400" if url.nil?
 
-      Deployer.notify(url)
-      "202"
+      case env["HTTP_X_GITHUB_EVENT"]
+      when "deployment"
+        deploy(url(body))
+      when "ping"
+        "200"
+      when nil
+        "400"
+      else
+        "422"
+      end
     end
 
     def url(body)
       JSON.parse(body)["deployment"]["url"]
     rescue # rubocop:disable Lint/HandleExceptions
+    end
+
+    def deploy(url)
+      return "400" if url.nil?
+
+      Deployer.notify(url)
+      "202"
     end
 
     def response(code)
