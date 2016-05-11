@@ -1,0 +1,6 @@
+[application]
+name = 'Shipping Agent'
+repo = 'quay.io/assemblyline/shipping_agent'
+
+[build]
+builder = 'ruby'
