@@ -22,7 +22,7 @@ module ShippingAgent
 
         case env["HTTP_X_GITHUB_EVENT"]
         when "deployment"
-          deploy(url(body))
+          deploy(deployment_params(body))
         when "ping"
           "200"
         when nil
@@ -32,15 +32,10 @@ module ShippingAgent
         end
       end
 
-      def url(body)
-        JSON.parse(body)["deployment"]["url"]
-      rescue # rubocop:disable Lint/HandleExceptions
-      end
+      def deploy(params)
+        return "400" if params.nil? || invalid?(params)
 
-      def deploy(url)
-        return "400" if url.nil?
-
-        ShippingAgent::Deployer.notify(url)
+        ShippingAgent::Deployer.deploy(params)
         "202"
       end
 
@@ -50,6 +45,34 @@ module ShippingAgent
 
       def authorized?(signature:, body:)
         signature == "sha1=" + OpenSSL::HMAC.hexdigest(HMAC_DIGEST, secret, body)
+      end
+
+      private
+
+      def deployment_params(body)
+        deployment = JSON.parse(body)["deployment"]
+        image      = deployment["payload"]["image"]
+
+        {
+          deploy_id: "github.#{deployment["id"]}",
+          namespace: deployment["environment"],
+          image:     image,
+        }.merge(image_metadata(image))
+
+      rescue # rubocop:disable Lint/HandleExceptions
+      end
+
+      def invalid?(params)
+        [:deploy_id, :namespace, :image].any? { |p| params[p].nil? }
+      end
+
+      def image_metadata(image)
+        tag = image.split(":").last.split("_")
+        {
+          app:      image.split("/").last.split(":").first,
+          build_id: tag.last,
+          vcs_id:   tag.first,
+        }
       end
     end
   end
