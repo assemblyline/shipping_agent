@@ -8,4 +8,5 @@ group :test do
   gem "rack-test"
   gem "rake"
   gem "reevoocop"
+  gem "bundler-audit"
 end
