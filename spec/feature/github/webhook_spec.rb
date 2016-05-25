@@ -1,19 +1,19 @@
 require "feature_helper"
-require "shipping_agent/webhook"
+require "shipping_agent/github/webhook"
 require "openssl"
 require "json"
 require "securerandom"
 
-RSpec.describe ShippingAgent::Webhook do
+RSpec.describe ShippingAgent::Github::Webhook do
   let(:secret) { "thisissekret" }
   let(:body)  { '{"foo":"bar"}' }
 
   def app
-    ShippingAgent::Webhook
+    described_class
   end
 
   before do
-    ShippingAgent::Webhook.secret = secret
+    app.secret = secret
   end
 
   describe "GET" do
