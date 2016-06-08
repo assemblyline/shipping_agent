@@ -6,7 +6,7 @@ require "securerandom"
 
 RSpec.describe ShippingAgent::Github::Webhook do
   let(:secret) { "thisissekret" }
-  let(:body)  { '{"foo":"bar"}' }
+  let(:body) { '{"foo":"bar"}' }
 
   def app
     described_class
