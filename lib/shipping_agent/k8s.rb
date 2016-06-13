@@ -1,6 +1,7 @@
 require "net/http"
 require "json"
 require "uri"
+require "shipping_agent/logger"
 
 module ShippingAgent
   module K8s
@@ -16,7 +17,10 @@ module ShippingAgent
 
     def patch_deployment(name:, namespace:, body:)
       endpoint = endpoint_for("/apis/extensions/v1beta1/namespaces/#{namespace}/deployments/#{name}")
-      patch(endpoint, body)
+      LOGGER.debug { "patching: #{endpoint} with: #{body.inspect}" }
+      response = patch(endpoint, body)
+      LOGGER.debug { "k8s response: #{response.inspect}" }
+      response
     end
 
     private

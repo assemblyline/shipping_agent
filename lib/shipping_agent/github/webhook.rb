@@ -1,6 +1,7 @@
 require "openssl"
 require "json"
 require "shipping_agent/deploy"
+require "shipping_agent/logger"
 
 module ShippingAgent
   module Github
@@ -18,6 +19,7 @@ module ShippingAgent
 
       def handle_hook(env)
         body = env["rack.input"].read
+        LOGGER.debug { "raw webhook: #{body}" }
         return "401" unless authorized?(signature: env["HTTP_X_HUB_SIGNATURE"], body: body)
 
         case env["HTTP_X_GITHUB_EVENT"]
@@ -34,7 +36,7 @@ module ShippingAgent
 
       def deploy(params)
         return "400" if params.nil? || invalid?(params)
-
+        LOGGER.debug { "deployment params: #{params.inspect}" }
         ShippingAgent::Deploy.deploy(params)
         "202"
       end
