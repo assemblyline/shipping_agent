@@ -24,7 +24,7 @@ RSpec.describe ShippingAgent::Github::Webhook do
     end
 
     it "does not notify the deployer" do
-      expect(ShippingAgent::Deployer).to_not receive(:deploy)
+      expect(ShippingAgent::Deploy).to_not receive(:deploy)
       get "/"
     end
   end
@@ -38,7 +38,7 @@ RSpec.describe ShippingAgent::Github::Webhook do
       end
 
       it "does not notify the deployer" do
-        expect(ShippingAgent::Deployer).to_not receive(:deploy)
+        expect(ShippingAgent::Deploy).to_not receive(:deploy)
         post "/", body
       end
 
@@ -101,10 +101,10 @@ RSpec.describe ShippingAgent::Github::Webhook do
         before { header "X-GitHub-Event", "deployment" }
 
         it "notifies the deployer" do
-          expect(ShippingAgent::Deployer).to receive(:deploy).with(
-            deploy_id: "github.#{id}",
-            build_id:  build,
-            vcs_id:    sha,
+          expect(ShippingAgent::Deploy).to receive(:deploy).with(
+            deploy: "github.#{id}",
+            build:  build,
+            version:    sha,
             namespace: namespace,
             image: "quay.io/reevoo/#{app_name}:#{sha}_#{build}",
             app: app_name,
@@ -125,7 +125,7 @@ RSpec.describe ShippingAgent::Github::Webhook do
           # TODO, we should notify the user somehow
 
           it "returns a 400" do
-            expect(ShippingAgent::Deployer).to_not receive(:deploy)
+            expect(ShippingAgent::Deploy).to_not receive(:deploy)
             post "/", body
             expect(last_response).to be_bad_request
           end
@@ -136,7 +136,7 @@ RSpec.describe ShippingAgent::Github::Webhook do
             let(:body) { "wellthisisntirght" }
 
             it "returns a 400" do
-              expect(ShippingAgent::Deployer).to_not receive(:deploy)
+              expect(ShippingAgent::Deploy).to_not receive(:deploy)
               post "/", body
               expect(last_response).to be_bad_request
             end
@@ -146,7 +146,7 @@ RSpec.describe ShippingAgent::Github::Webhook do
             let(:body) { JSON.dump(deployment: {}) }
 
             it "returns a 400" do
-              expect(ShippingAgent::Deployer).to_not receive(:deploy)
+              expect(ShippingAgent::Deploy).to_not receive(:deploy)
               post "/", body
               expect(last_response).to be_bad_request
             end

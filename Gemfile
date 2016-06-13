@@ -1,7 +1,6 @@
 source "https://rubygems.org"
 
 gem "puma"
-gem "curb"
 
 group :test do
   gem "pry"
@@ -10,4 +9,5 @@ group :test do
   gem "rake"
   gem "reevoocop"
   gem "bundler-audit"
+  gem "webmock"
 end

@@ -1,4 +1,5 @@
 require "pry"
+require "webmock/rspec"
 
 ENV["RACK_ENV"] ||= "test"
 

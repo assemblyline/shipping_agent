@@ -1,6 +1,6 @@
 require "openssl"
 require "json"
-require "shipping_agent/deployer"
+require "shipping_agent/deploy"
 
 module ShippingAgent
   module Github
@@ -35,7 +35,7 @@ module ShippingAgent
       def deploy(params)
         return "400" if params.nil? || invalid?(params)
 
-        ShippingAgent::Deployer.deploy(params)
+        ShippingAgent::Deploy.deploy(params)
         "202"
       end
 
@@ -54,7 +54,7 @@ module ShippingAgent
         image      = deployment["payload"]["image"]
 
         {
-          deploy_id: "github.#{deployment["id"]}",
+          deploy: "github.#{deployment["id"]}",
           namespace: deployment["environment"],
           image:     image,
         }.merge(image_metadata(image))
@@ -63,15 +63,15 @@ module ShippingAgent
       end
 
       def invalid?(params)
-        [:deploy_id, :namespace, :image].any? { |p| params[p].nil? }
+        [:deploy, :namespace, :image].any? { |p| params[p].nil? }
       end
 
       def image_metadata(image)
         tag = image.split(":").last.split("_")
         {
           app:      image.split("/").last.split(":").first,
-          build_id: tag.last,
-          vcs_id:   tag.first,
+          build:    tag.last,
+          version:  tag.first,
         }
       end
     end
