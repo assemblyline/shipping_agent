@@ -6,7 +6,7 @@ require "securerandom"
 
 RSpec.describe ShippingAgent::Github::Webhook do
   let(:secret) { "thisissekret" }
-  let(:body)  { '{"foo":"bar"}' }
+  let(:body) { '{"foo":"bar"}' }
 
   def app
     described_class
@@ -24,7 +24,7 @@ RSpec.describe ShippingAgent::Github::Webhook do
     end
 
     it "does not notify the deployer" do
-      expect(ShippingAgent::Deployer).to_not receive(:notify)
+      expect(ShippingAgent::Deploy).to_not receive(:deploy)
       get "/"
     end
   end
@@ -38,7 +38,7 @@ RSpec.describe ShippingAgent::Github::Webhook do
       end
 
       it "does not notify the deployer" do
-        expect(ShippingAgent::Deployer).to_not receive(:notify)
+        expect(ShippingAgent::Deploy).to_not receive(:deploy)
         post "/", body
       end
 
@@ -81,14 +81,54 @@ RSpec.describe ShippingAgent::Github::Webhook do
 
       context "with a deployment event" do
         let(:url) { SecureRandom.hex }
-        let(:body) { JSON.dump(deployment: { url: url }) }
+        let(:id)  { rand(1..10_000) }
+        let(:sha) { SecureRandom.hex }
+        let(:build) { rand(1..234_565).to_s }
+        let(:namespace) { %w(staging sandbox production).sample }
+        let(:app_name) { %w(catnip dogfood fishflakes).sample }
+        let(:deployment) do
+          {
+            url: url,
+            id: id,
+            environment: namespace,
+            payload: {
+              image: "quay.io/reevoo/#{app_name}:#{sha}_#{build}",
+            },
+          }
+        end
+        let(:body) { JSON.dump(deployment: deployment) }
 
         before { header "X-GitHub-Event", "deployment" }
 
         it "notifies the deployer" do
-          expect(ShippingAgent::Deployer).to receive(:notify).with(url)
+          expect(ShippingAgent::Deploy).to receive(:deploy).with(
+            deploy: "github.#{id}",
+            build:  build,
+            version:    sha,
+            namespace: namespace,
+            image: "quay.io/reevoo/#{app_name}:#{sha}_#{build}",
+            app: app_name,
+          )
           post "/", body
           expect(last_response).to be_accepted
+        end
+
+        context "without an image in the payload" do
+          let(:deployment) do
+            {
+              url: url,
+              id: id,
+              environment: namespace,
+              payload: {},
+            }
+          end
+          # TODO, we should notify the user somehow
+
+          it "returns a 400" do
+            expect(ShippingAgent::Deploy).to_not receive(:deploy)
+            post "/", body
+            expect(last_response).to be_bad_request
+          end
         end
 
         context "which is malformed" do
@@ -96,7 +136,7 @@ RSpec.describe ShippingAgent::Github::Webhook do
             let(:body) { "wellthisisntirght" }
 
             it "returns a 400" do
-              expect(ShippingAgent::Deployer).to_not receive(:notify)
+              expect(ShippingAgent::Deploy).to_not receive(:deploy)
               post "/", body
               expect(last_response).to be_bad_request
             end
@@ -106,7 +146,7 @@ RSpec.describe ShippingAgent::Github::Webhook do
             let(:body) { JSON.dump(deployment: {}) }
 
             it "returns a 400" do
-              expect(ShippingAgent::Deployer).to_not receive(:notify)
+              expect(ShippingAgent::Deploy).to_not receive(:deploy)
               post "/", body
               expect(last_response).to be_bad_request
             end

@@ -9,4 +9,6 @@ group :test do
   gem "rake"
   gem "reevoocop"
   gem "bundler-audit"
+  gem "webmock"
+  gem "simplecov", require: false
 end
