@@ -12,3 +12,4 @@ Config is set up with environment variables.
 |Name                    | Description|
 |------------------------|------------|
 |`GITHUB_WEBHOOK_SECRET` | The webhook secret [see](https://developer.github.com/v3/repos/hooks/#create-a-hook) |
+|`LOG_LEVEL`             | The log level to use FATAL, ERROR, WARN, INFO or DEBUG. Defaults to WARN             |
