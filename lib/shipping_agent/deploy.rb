@@ -3,7 +3,7 @@ require "shipping_agent/k8s"
 module ShippingAgent
   class Deploy
     def initialize(info)
-      @app       = info[:app]
+      @app       = info[:app].tr("_", "-")
       @build     = info[:build]
       @deploy    = info[:deploy]
       @image     = info[:image]

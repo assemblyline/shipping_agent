@@ -7,7 +7,7 @@ RSpec.describe ShippingAgent::Deploy do
   describe "#apply" do
     let(:info) do
       {
-        app:       "shipping-agent",
+        app:       "shipping_agent",
         build:     "1234",
         deploy:    "github:1233456",
         image:     "quay.io/assemblyline/shipping_agent:f255129c9944d5a597e15e5c11118bd03cb220ad_1234",
