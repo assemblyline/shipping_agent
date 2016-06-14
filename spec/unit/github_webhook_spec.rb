@@ -102,12 +102,15 @@ RSpec.describe ShippingAgent::Github::Webhook do
 
         it "notifies the deployer" do
           expect(ShippingAgent::Deploy).to receive(:deploy).with(
-            deploy: "github.#{id}",
-            build:  build,
-            version:    sha,
             namespace: namespace,
             image: "quay.io/reevoo/#{app_name}:#{sha}_#{build}",
             app: app_name,
+            labels: {
+              deploy: "github.#{id}",
+              build:  build,
+              version:    sha,
+            },
+            deployment_url: url,
           )
           post "/", body
           expect(last_response).to be_accepted

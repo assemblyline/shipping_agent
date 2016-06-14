@@ -1,6 +1,7 @@
 source "https://rubygems.org"
 
 gem "puma"
+gem "octokit"
 
 group :test do
   gem "pry"

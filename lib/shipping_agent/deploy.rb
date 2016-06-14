@@ -1,17 +1,17 @@
 require "shipping_agent/k8s"
+require "shipping_agent/notification"
 
 module ShippingAgent
   class Deploy
     def initialize(info)
       @app       = info[:app].tr("_", "-")
-      @build     = info[:build]
-      @deploy    = info[:deploy]
       @image     = info[:image]
+      @labels    = info[:labels]
       @namespace = info[:namespace]
-      @version   = info[:version]
+      @url       = info[:deployment_url]
     end
 
-    attr_reader :app, :build, :deploy, :image, :namespace, :version
+    attr_reader :app, :image, :labels, :namespace, :url
 
     def self.deploy(info)
       new(info).apply
@@ -23,10 +23,10 @@ module ShippingAgent
           name: deployment,
           namespace: namespace,
           body: {
-            "metadata" => metadata,
+            "metadata" => { "labels" => labels },
             "spec" => {
               "template" => {
-                "metadata" => metadata,
+                "metadata" => { "labels" => labels },
                 "spec" => {
                   "containers" => [
                     {
@@ -39,23 +39,38 @@ module ShippingAgent
             },
           },
         )
+        Notification.notify("pending", "Config for #{deployment} pushed to kubernetes", url)
       end
+      Thread.new { wait }
+    end
+
+    def wait
+      Timeout.timeout(300) do
+        loop do
+          if deployments.all? { |name| update_complete?(name) }
+            Notification.notify("success", "#{app} deployed sucessfully to #{namespace}", url)
+            break
+          end
+          sleep 0.5
+        end
+      end
+    rescue Timeout::Error
+      Notification.notify("error", "#{app} deploy to #{namespace} timed out", url)
     end
 
     private
 
-    def metadata
-      {
-        "labels" => {
-          "version" => version,
-          "build"   => build,
-          "deploy"  => deploy,
-        },
-      }
+    def update_complete?(name)
+      K8s.deployment(namespace: namespace, name: name)["status"]
+        .values_at("replicas", "updatedReplicas", "availableReplicas")
+        .uniq.size == 1
     end
 
     def deployments
-      K8s.deployments(namespace: namespace, selector: { app: app }).map { |deployment| deployment["metadata"]["name"] }
+      @deployments ||= K8s.deployments(
+        namespace: namespace,
+        selector: { app: app },
+      ).map { |deployment| deployment["metadata"]["name"] }
     end
   end
 end

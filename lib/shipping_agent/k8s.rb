@@ -7,6 +7,10 @@ module ShippingAgent
   module K8s
     extend self
 
+    def deployment(namespace:, name:)
+      get(endpoint_for("/apis/extensions/v1beta1/namespaces/#{namespace}/deployments/#{name}"))
+    end
+
     def deployments(namespace:, selector: {})
       endpoint = endpoint_for("/apis/extensions/v1beta1/namespaces/#{namespace}/deployments")
       if selector.any?
