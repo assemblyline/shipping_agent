@@ -58,19 +58,24 @@ RSpec.describe "Deploying To Kubernetes" do
       ),
       headers: {},
     )
+
+    stub_request(:patch, %r{https://foo\.kube\.local/.*})
+      .to_return(status: 200, body: JSON.dump({}))
   end
 
   it "patches the k8s deployments with the new metadata and image" do
-    patch = {
-      "metadata" => {
-        "labels" => {
-          "version" => sha,
-          "build"   => build,
-          "deploy"  => "github.#{id}",
-        },
-      },
-      "spec" => {
-        "template" => {
+    header "X-Hub-Signature", "sha1=" + OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new("sha1"), secret, body)
+    header "X-GitHub-Event", "deployment"
+    post "/", body
+
+    expect(last_response).to be_accepted
+
+    %w(dogfood-can dogfood-bowl).each do |deployment_name|
+      expect(WebMock).to have_requested(
+        :patch,
+        "https://foo.kube.local/apis/extensions/v1beta1/namespaces/production/deployments/#{deployment_name}",
+      ).with(
+        body: JSON.dump(
           "metadata" => {
             "labels" => {
               "version" => sha,
@@ -79,29 +84,27 @@ RSpec.describe "Deploying To Kubernetes" do
             },
           },
           "spec" => {
-            "containers" => [
-              { "name" => "dogfood", "image" => "quay.io/reevoo/#{app_name}:#{sha}_#{build}" },
-            ],
+            "template" => {
+              "metadata" => {
+                "labels" => {
+                  "version" => sha,
+                  "build"   => build,
+                  "deploy"  => "github.#{id}",
+                },
+              },
+              "spec" => {
+                "containers" => [
+                  { "name" => "dogfood", "image" => "quay.io/reevoo/#{app_name}:#{sha}_#{build}" },
+                ],
+              },
+            },
           },
+        ),
+        headers: {
+          "Content-Type" => "application/strategic-merge-json-patch+json",
+          "Authorization" => "Bearer iAMtheTOKEN",
         },
-      },
-    }
-
-    expect(ShippingAgent::K8s).to receive(:patch_deployment).with(
-      namespace: "production",
-      name:      "dogfood-can",
-      body:      patch,
-    )
-
-    expect(ShippingAgent::K8s).to receive(:patch_deployment).with(
-      namespace: "production",
-      name:      "dogfood-bowl",
-      body:      patch,
-    )
-
-    header "X-Hub-Signature", "sha1=" + OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new("sha1"), secret, body)
-    header "X-GitHub-Event", "deployment"
-    post "/", body
-    expect(last_response).to be_accepted
+      )
+    end
   end
 end

@@ -35,6 +35,7 @@ module ShippingAgent
 
     def patch(uri, body)
       req = Net::HTTP::Patch.new(uri)
+      req.content_type = "application/strategic-merge-json-patch+json"
       req.body = JSON.dump(body)
       perform(uri, req)
     end
