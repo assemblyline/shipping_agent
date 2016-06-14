@@ -100,7 +100,7 @@ RSpec.describe "Deploying To Kubernetes" do
           },
         ),
         headers: {
-          "Content-Type" => "application/strategic-merge-json-patch+json",
+          "Content-Type" => "application/strategic-merge-patch+json",
           "Authorization" => "Bearer iAMtheTOKEN",
         },
       )

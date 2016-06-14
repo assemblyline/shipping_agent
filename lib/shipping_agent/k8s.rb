@@ -51,7 +51,8 @@ module ShippingAgent
       fail(
         RequestNotSucessfull,
         "Tried to #{request.class} #{uri} " \
-        "with: #{request.inspect} " \
+        "Headers: #{request.to_hash.inspect} " \
+        "Body: #{request.body} " \
         "but failed with #{response.code} - #{response.body}",
       )
     end
@@ -69,9 +70,9 @@ module ShippingAgent
     end
 
     def headers(request)
-      request["Accept"] =  "application/json"
+      request["Accept"]        =  "application/json"
       request["Authorization"] = "Bearer #{bearer_token}"
-      request.content_type = "application/strategic-merge-json-patch+json" if request.is_a? Net::HTTP::Patch
+      request["Content-Type"]  = "application/strategic-merge-patch+json" if request.is_a? Net::HTTP::Patch
     end
 
     def endpoint_for(path)

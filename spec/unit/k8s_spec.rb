@@ -16,7 +16,7 @@ RSpec.describe ShippingAgent::K8s do
           body: '{"foo":"bar"}',
           headers: {
             "Accept" => "application/json",
-            "Content-Type" => "application/strategic-merge-json-patch+json",
+            "Content-Type" => "application/strategic-merge-patch+json",
             "Accept-Encoding" => "gzip;q=1.0,deflate;q=0.6,identity;q=0.3",
             "Authorization" => "Bearer IamTHEtoken",
             "Host" => "kube.foo.com",
