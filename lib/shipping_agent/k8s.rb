@@ -12,7 +12,10 @@ module ShippingAgent
       if selector.any?
         endpoint.query = "labelSelector=#{selector.map { |label| label.join("%3D") }.join("%2C")}"
       end
-      get(endpoint)["items"]
+      LOGGER.debug { "patching: #{endpoint} with: #{body.inspect}" }
+      response = get(endpoint)
+      LOGGER.debug { "k8s deployments: #{response.inspect}" }
+      response["items"]
     end
 
     def patch_deployment(name:, namespace:, body:)
