@@ -4,14 +4,12 @@ module ShippingAgent
   class Deploy
     def initialize(info)
       @app       = info[:app].tr("_", "-")
-      @build     = info[:build]
-      @deploy    = info[:deploy]
       @image     = info[:image]
+      @labels  = info[:labels]
       @namespace = info[:namespace]
-      @version   = info[:version]
     end
 
-    attr_reader :app, :build, :deploy, :image, :namespace, :version
+    attr_reader :app, :image, :labels, :namespace
 
     def self.deploy(info)
       new(info).apply
@@ -23,10 +21,10 @@ module ShippingAgent
           name: deployment,
           namespace: namespace,
           body: {
-            "metadata" => metadata,
+            "metadata" => { "labels" => labels },
             "spec" => {
               "template" => {
-                "metadata" => metadata,
+                "metadata" => { "labels" => labels },
                 "spec" => {
                   "containers" => [
                     {
@@ -43,16 +41,6 @@ module ShippingAgent
     end
 
     private
-
-    def metadata
-      {
-        "labels" => {
-          "version" => version,
-          "build"   => build,
-          "deploy"  => deploy,
-        },
-      }
-    end
 
     def deployments
       K8s.deployments(namespace: namespace, selector: { app: app }).map { |deployment| deployment["metadata"]["name"] }

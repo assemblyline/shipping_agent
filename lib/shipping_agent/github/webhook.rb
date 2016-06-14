@@ -53,27 +53,27 @@ module ShippingAgent
 
       def deployment_params(body)
         deployment = JSON.parse(body)["deployment"]
-        image      = deployment["payload"]["image"]
-
+        image = deployment["payload"]["image"]
         {
-          deploy: "github.#{deployment["id"]}",
           namespace: deployment["environment"],
           image:     image,
-        }.merge(image_metadata(image))
+          app:       image.split("/").last.split(":").first,
+          labels:    labels(deployment),
+        }
 
       rescue # rubocop:disable Lint/HandleExceptions
       end
 
       def invalid?(params)
-        [:deploy, :namespace, :image].any? { |p| params[p].nil? }
+        [:namespace, :image, :labels].any? { |p| params[p].nil? }
       end
 
-      def image_metadata(image)
-        tag = image.split(":").last.split("_")
+      def labels(deployment)
+        tag = deployment["payload"]["image"].split(":").last.split("_")
         {
-          app:      image.split("/").last.split(":").first,
-          build:    tag.last,
           version:  tag.first,
+          build:    tag.last,
+          deploy: "github.#{deployment["id"]}",
         }
       end
     end
