@@ -57,7 +57,7 @@ RSpec.describe ShippingAgent::Deploy do
                 },
               },
               "spec" => {
-                "containers": [
+                "containers" => [
                   {
                     "name" => "shipping-agent",
                     "image" => info[:image],

@@ -28,7 +28,7 @@ module ShippingAgent
               "template" => {
                 "metadata" => metadata,
                 "spec" => {
-                  "containers": [
+                  "containers" => [
                     {
                       "name" => app,
                       "image" => image,
