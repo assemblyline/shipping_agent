@@ -55,10 +55,11 @@ module ShippingAgent
         deployment = JSON.parse(body)["deployment"]
         image = deployment["payload"]["image"]
         {
-          namespace: deployment["environment"],
-          image:     image,
-          app:       image.split("/").last.split(":").first,
-          labels:    labels(deployment),
+          namespace:      deployment["environment"],
+          image:          image,
+          app:            image.split("/").last.split(":").first,
+          labels:         labels(deployment),
+          deployment_url: deployment["url"],
         }
 
       rescue # rubocop:disable Lint/HandleExceptions

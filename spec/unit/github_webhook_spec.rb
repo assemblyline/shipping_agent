@@ -110,6 +110,7 @@ RSpec.describe ShippingAgent::Github::Webhook do
               build:  build,
               version:    sha,
             },
+            deployment_url: url,
           )
           post "/", body
           expect(last_response).to be_accepted
