@@ -51,8 +51,8 @@ module ShippingAgent
       return JSON.parse(response.body) if response.is_a?(Net::HTTPSuccess)
       fail(
         RequestNotSucessfull,
-        "Tried to #{request.class} #{uri.path}" \
-        "with: #{request.body}" \
+        "Tried to #{request.class} #{uri.path} " \
+        "with: #{request.inspect} " \
         "but failed with #{response.code} - #{response.body}",
       )
     end
