@@ -15,7 +15,7 @@ RSpec.describe ShippingAgent::K8s do
         .with(
           body: '{"foo":"bar"}',
           headers: {
-            "Accept" => "*/*",
+            "Accept" => "application/json",
             "Content-Type" => "application/strategic-merge-json-patch+json",
             "Accept-Encoding" => "gzip;q=1.0,deflate;q=0.6,identity;q=0.3",
             "Authorization" => "Bearer IamTHEtoken",
@@ -35,7 +35,7 @@ RSpec.describe ShippingAgent::K8s do
       stub_request(:get, "https://kube.foo.com/apis/extensions/v1beta1/namespaces/kittens/deployments")
         .with(
           headers: {
-            "Accept" => "*/*",
+            "Accept" => "application/json",
             "Accept-Encoding" => "gzip;q=1.0,deflate;q=0.6,identity;q=0.3",
             "Authorization" => "Bearer IamTHEtoken",
             "Host" => "kube.foo.com",
@@ -51,7 +51,7 @@ RSpec.describe ShippingAgent::K8s do
         stub_request(:get, "https://kube.foo.com/apis/extensions/v1beta1/namespaces/kittens/deployments?labelSelector=language%3Djava%2Ctype%3Dwebserver") # rubocop:disable Metrics/LineLength
           .with(
           headers: {
-            "Accept" => "*/*",
+            "Accept" => "application/json",
             "Accept-Encoding" => "gzip;q=1.0,deflate;q=0.6,identity;q=0.3",
             "Authorization" => "Bearer IamTHEtoken",
             "Host" => "kube.foo.com",

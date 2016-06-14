@@ -42,8 +42,7 @@ RSpec.describe "Deploying To Kubernetes" do
       "https://foo.kube.local/apis/extensions/v1beta1/namespaces/production/deployments?labelSelector=app=dogfood",
     ).with(
       headers: {
-        "Accept" => "*/*",
-        "Accept-Encoding" => "gzip;q=1.0,deflate;q=0.6,identity;q=0.3",
+        "Accept" => "application/json",
         "Authorization" => "Bearer iAMtheTOKEN",
         "Host" => "foo.kube.local",
         "User-Agent" => "Ruby",

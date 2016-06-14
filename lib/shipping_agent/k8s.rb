@@ -35,7 +35,6 @@ module ShippingAgent
 
     def patch(uri, body)
       req = Net::HTTP::Patch.new(uri)
-      req.content_type = "application/strategic-merge-json-patch+json"
       req.body = JSON.dump(body)
       perform(uri, req)
     end
@@ -45,23 +44,34 @@ module ShippingAgent
     end
 
     def perform(uri, request)
-      http = Net::HTTP.new(uri.hostname, uri.port)
-      auth(http, request)
+      http = client(uri)
+      headers(request)
       response = http.request(request)
       return JSON.parse(response.body) if response.is_a?(Net::HTTPSuccess)
       fail(
         RequestNotSucessfull,
-        "Tried to #{request.class} #{uri.path} " \
+        "Tried to #{request.class} #{uri} " \
         "with: #{request.inspect} " \
         "but failed with #{response.code} - #{response.body}",
       )
     end
 
-    def auth(http, req)
+    def client(uri)
+      http = Net::HTTP.new(uri.hostname, uri.port)
+      ssl(http)
+      http
+    end
+
+    def ssl(http)
       http.use_ssl = true
       http.verify_mode = OpenSSL::SSL::VERIFY_PEER
       http.ca_file = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
-      req["Authorization"] = "Bearer #{bearer_token}"
+    end
+
+    def headers(request)
+      request["Accept"] =  "application/json"
+      request["Authorization"] = "Bearer #{bearer_token}"
+      request.content_type = "application/strategic-merge-json-patch+json" if request.is_a? Net::HTTP::Patch
     end
 
     def endpoint_for(path)
