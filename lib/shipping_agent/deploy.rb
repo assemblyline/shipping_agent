@@ -39,7 +39,7 @@ module ShippingAgent
             },
           },
         )
-        Notification.notify("pending", "Config for #{deployment} pushed to kubernetes", url)
+        Notification.update("pending", "Config for #{deployment} pushed to kubernetes", url)
       end
       Thread.new { wait }
     end
@@ -48,14 +48,14 @@ module ShippingAgent
       Timeout.timeout(300) do
         loop do
           if deployments.all? { |name| update_complete?(name) }
-            Notification.notify("success", "#{app} deployed sucessfully to #{namespace}", url)
+            Notification.update("success", "#{app} deployed sucessfully to #{namespace}", self)
             break
           end
           sleep 0.5
         end
       end
     rescue Timeout::Error
-      Notification.notify("error", "#{app} deploy to #{namespace} timed out", url)
+      Notification.update("error", "#{app} deploy to #{namespace} timed out", self)
     end
 
     private
