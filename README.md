@@ -16,3 +16,4 @@ Config is set up with environment variables.
 |`GITHUB_WEBHOOK_SECRET` | The webhook secret [see](https://developer.github.com/v3/repos/hooks/#create-a-hook) |
 |`LOG_LEVEL`             | The log level to use FATAL, ERROR, WARN, INFO or DEBUG. Defaults to WARN             |
 |`GITHUB_TOKEN`          | The Github OAuth token used for notifications                                        |
+|`DEPLOY_TIMEOUT`        | The length of time, in seconds before a deploy is marked as Errored, ensure that terminationGracePeriodSeconds on the kubernetes pod is larger or shipping_agent could be killed before the notification is sent. Defaults to 300|

@@ -46,16 +46,14 @@ module ShippingAgent
     end
 
     def notify_when_complete
-      Timeout.timeout(300) do
-        loop do
-          if complete?
-            Notification.update("success", "#{app} deployed sucessfully to #{namespace}", self)
-            break
-          end
-          sleep 0.5
+      check_until = Time.now + ENV.fetch("DEPLOY_TIMEOUT", "300").to_i
+      until Time.now >= check_until
+        if complete?
+          Notification.update("success", "#{app} deployed sucessfully to #{namespace}", self)
+          return
         end
+        sleep 0.5
       end
-    rescue Timeout::Error
       Notification.update("error", "#{app} deploy to #{namespace} timed out", self)
     end
 

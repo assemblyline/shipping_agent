@@ -86,12 +86,12 @@ RSpec.describe ShippingAgent::Deploy do
     it "waits for the deployment to be complete" do
       expect(ShippingAgent::K8s).to receive(:deployment)
         .with(namespace: "assemblyline", name: "shipping-agent-api")
-        .and_return(ds(0, 2), ds(1, 3), ds(2, 2))
+        .and_return(deploy_status(0, 2), deploy_status(1, 3), deploy_status(2, 2))
         .at_least(3).times
 
       expect(ShippingAgent::K8s).to receive(:deployment)
         .with(namespace: "assemblyline", name: "shipping-agent-worker")
-        .and_return(ds(0, 2), ds(1, 3), ds(2, 2))
+        .and_return(deploy_status(0, 2), deploy_status(1, 3), deploy_status(2, 2))
         .at_least(3).times
 
       expect(ShippingAgent::Notification).to receive(:update)
@@ -100,7 +100,21 @@ RSpec.describe ShippingAgent::Deploy do
       subject.notify_when_complete
     end
 
-    def ds(updated, available)
+    context "when the deployment does not complete within the timeout" do
+      it "notifies of the error" do
+        with_env("DEPLOY_TIMEOUT" => "0") do
+          allow(ShippingAgent::K8s).to receive(:deployment)
+            .and_return(deploy_status(0, 2), deploy_status(1, 3))
+
+          expect(ShippingAgent::Notification).to receive(:update)
+            .with("error", "shipping-agent deploy to assemblyline timed out", subject)
+
+          subject.notify_when_complete
+        end
+      end
+    end
+
+    def deploy_status(updated, available)
       {
         "status" => {
           "replicas" => 2,
