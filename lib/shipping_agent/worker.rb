@@ -6,23 +6,14 @@ require "shipping_agent/logger"
 module ShippingAgent
   class Worker
     include Singleton
+    extend SingleForwardable
 
     def initialize
       @running = false
       purge
     end
 
-    def self.work(job)
-      instance.work(job)
-    end
-
-    def self.run
-      instance.run
-    end
-
-    def self.stop
-      instance.stop
-    end
+    def_delegators :instance, :work, :run, :stop, :purge
 
     def purge
       @queue = Queue.new

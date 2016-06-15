@@ -1,18 +1,14 @@
 require "singleton"
 require "observer"
+require "forwardable"
 
 module ShippingAgent
   class Notification
     include Singleton
     include Observable
+    extend SingleForwardable
 
-    def self.add_observer(*args)
-      instance.add_observer(*args)
-    end
-
-    def self.update(*args)
-      instance.update(*args)
-    end
+    def_delegators :instance, :add_observer, :update
 
     def update(status, description, deploy)
       changed

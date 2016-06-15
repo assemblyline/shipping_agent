@@ -3,7 +3,7 @@ require "shipping_agent/worker"
 
 RSpec.describe ShippingAgent::Worker do
   before do
-    ShippingAgent::Worker.instance.purge
+    ShippingAgent::Worker.purge
   end
 
   it "does the work to completion" do

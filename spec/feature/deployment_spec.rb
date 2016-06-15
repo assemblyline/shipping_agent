@@ -33,7 +33,7 @@ RSpec.describe "Deploying To Kubernetes" do
 
     ENV["KUBERNETES_SERVICE_HOST"] = "foo.kube.local"
 
-    ShippingAgent::Worker.instance.purge
+    ShippingAgent::Worker.purge
     ShippingAgent::Worker.run
 
     allow(File).to receive(:read)
