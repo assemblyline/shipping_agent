@@ -5,5 +5,8 @@ require "shipping_agent/logger"
 
 ShippingAgent::Github::Webhook.secret = ENV.fetch("GITHUB_WEBHOOK_SECRET")
 
+ShippingAgent::Worker.run
+at_exit { ShippingAgent::Worker.stop }
+
 use Rack::CommonLogger, ShippingAgent::LOGGER
 run ShippingAgent::Github::Webhook

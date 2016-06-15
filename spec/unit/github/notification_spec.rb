@@ -101,4 +101,23 @@ RSpec.describe ShippingAgent::Github::Notification do
       )
     end
   end
+
+  context "when the notification fails" do
+    it "logs the error and moves on" do
+      expect(ShippingAgent::LOGGER).to receive(:warn) do |_, &block|
+        expect(block.call).to eq(
+          "Failed to update github with: [success] the deploy was a success - " \
+            'due to: KeyError key not found: "GITHUB_TOKEN"',
+        )
+      end
+
+      ENV["GITHUB_TOKEN"] = nil
+
+      subject.update(
+        "success",
+        "the deploy was a success",
+        double(:deployment, url: "https://api.github.com/repos/octocat/example/deployments/3", namespace: "production"),
+      )
+    end
+  end
 end

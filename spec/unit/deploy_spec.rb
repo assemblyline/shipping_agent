@@ -47,13 +47,13 @@ RSpec.describe ShippingAgent::Deploy do
         .with(
           "pending",
           "Config for shipping-agent-api pushed to kubernetes",
-          "https://github/deployment/1",
+          subject,
         )
       expect(ShippingAgent::Notification).to receive(:update)
         .with(
           "pending",
           "Config for shipping-agent-worker pushed to kubernetes",
-          "https://github/deployment/1",
+          subject,
         )
       subject.apply
     end
@@ -82,7 +82,7 @@ RSpec.describe ShippingAgent::Deploy do
     end
   end
 
-  describe "#wait" do
+  describe "#notify_when_complete" do
     it "waits for the deployment to be complete" do
       expect(ShippingAgent::K8s).to receive(:deployment)
         .with(namespace: "assemblyline", name: "shipping-agent-api")
@@ -94,7 +94,10 @@ RSpec.describe ShippingAgent::Deploy do
         .and_return(ds(0, 2), ds(1, 3), ds(2, 2))
         .at_least(3).times
 
-      subject.wait
+      expect(ShippingAgent::Notification).to receive(:update)
+        .with("success", "shipping-agent deployed sucessfully to assemblyline", subject)
+
+      subject.notify_when_complete
     end
 
     def ds(updated, available)

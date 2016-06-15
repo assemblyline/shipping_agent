@@ -1,5 +1,6 @@
 require "shipping_agent/k8s"
 require "shipping_agent/notification"
+require "shipping_agent/worker"
 
 module ShippingAgent
   class Deploy
@@ -39,15 +40,15 @@ module ShippingAgent
             },
           },
         )
-        Notification.update("pending", "Config for #{deployment} pushed to kubernetes", url)
+        Notification.update("pending", "Config for #{deployment} pushed to kubernetes", self)
       end
-      Thread.new { wait }
+      Worker.work(-> { notify_when_complete })
     end
 
-    def wait
+    def notify_when_complete
       Timeout.timeout(300) do
         loop do
-          if deployments.all? { |name| update_complete?(name) }
+          if complete?
             Notification.update("success", "#{app} deployed sucessfully to #{namespace}", self)
             break
           end
@@ -60,10 +61,8 @@ module ShippingAgent
 
     private
 
-    def update_complete?(name)
-      K8s.deployment(namespace: namespace, name: name)["status"]
-        .values_at("replicas", "updatedReplicas", "availableReplicas")
-        .uniq.size == 1
+    def complete?
+      deployments.all? { |name| update_complete?(name) }
     end
 
     def deployments
@@ -71,6 +70,12 @@ module ShippingAgent
         namespace: namespace,
         selector: { app: app },
       ).map { |deployment| deployment["metadata"]["name"] }
+    end
+
+    def update_complete?(name)
+      K8s.deployment(namespace: namespace, name: name)["status"]
+        .values_at("replicas", "updatedReplicas", "availableReplicas")
+        .uniq.size == 1
     end
   end
 end
