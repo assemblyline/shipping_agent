@@ -24,7 +24,7 @@ RSpec.describe ShippingAgent::Deploy do
         { "metadata" => { "name" => "shipping-agent-api" } },
         { "metadata" => { "name" => "shipping-agent-worker" } },
       ])
-    allow(ShippingAgent::Notification).to receive(:notify)
+    allow(ShippingAgent::Notification).to receive(:update)
     allow(ShippingAgent::K8s).to receive(:patch_deployment)
   end
 
@@ -43,13 +43,13 @@ RSpec.describe ShippingAgent::Deploy do
     end
 
     it "sets up a notification" do
-      expect(ShippingAgent::Notification).to receive(:notify)
+      expect(ShippingAgent::Notification).to receive(:update)
         .with(
           "pending",
           "Config for shipping-agent-api pushed to kubernetes",
           "https://github/deployment/1",
         )
-      expect(ShippingAgent::Notification).to receive(:notify)
+      expect(ShippingAgent::Notification).to receive(:update)
         .with(
           "pending",
           "Config for shipping-agent-worker pushed to kubernetes",

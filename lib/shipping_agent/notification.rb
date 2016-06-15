@@ -4,16 +4,16 @@ require "shipping_agent/logger"
 module ShippingAgent
   module Notification
     extend self
-    def notify(status, description, url)
+    def update(status, description, deploy)
       github.create_deployment_status(
-        url,
+        deploy.url,
         status,
         accept: "application/vnd.github.ant-man-preview+json",
         description: description,
       )
     rescue => e
       LOGGER.warn do
-        "Failed to notify github of #{status}: #{description} - due to : #{e.class} #{e.message}"
+        "Failed to update github with: [#{status}] #{description} - due to: #{e.class} #{e.message}"
       end
     end
 

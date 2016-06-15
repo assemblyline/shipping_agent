@@ -2,7 +2,7 @@ require "spec_helper"
 require "shipping_agent/notification"
 
 RSpec.describe ShippingAgent::Notification do
-  describe ".notify" do
+  describe ".update" do
     let(:github) { double }
 
     before do
@@ -23,10 +23,10 @@ RSpec.describe ShippingAgent::Notification do
         description: "this is a notification test",
       )
 
-      described_class.notify(
+      described_class.update(
         "pending",
         "this is a notification test",
-        "https://api.github.com/repos/octocat/example/deployments/1",
+        double(:deployment, url: "https://api.github.com/repos/octocat/example/deployments/1"),
       )
     end
   end

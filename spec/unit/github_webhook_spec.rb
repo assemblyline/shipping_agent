@@ -23,7 +23,7 @@ RSpec.describe ShippingAgent::Github::Webhook do
       expect(last_response.body).to eq("ShippingAgent")
     end
 
-    it "does not notify the deployer" do
+    it "does not run the deployer" do
       expect(ShippingAgent::Deploy).to_not receive(:deploy)
       get "/"
     end
@@ -37,7 +37,7 @@ RSpec.describe ShippingAgent::Github::Webhook do
         expect(last_response).to be_unauthorized
       end
 
-      it "does not notify the deployer" do
+      it "does not run the deployer" do
         expect(ShippingAgent::Deploy).to_not receive(:deploy)
         post "/", body
       end
@@ -125,6 +125,7 @@ RSpec.describe ShippingAgent::Github::Webhook do
               payload: {},
             }
           end
+
           # TODO, we should notify the user somehow
 
           it "returns a 400" do
