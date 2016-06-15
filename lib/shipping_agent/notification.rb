@@ -1,26 +1,22 @@
-require "octokit"
-require "shipping_agent/logger"
+require "singleton"
+require "observer"
 
 module ShippingAgent
-  module Notification
-    extend self
-    def update(status, description, deploy)
-      github.create_deployment_status(
-        deploy.url,
-        status,
-        accept: "application/vnd.github.ant-man-preview+json",
-        description: description,
-      )
-    rescue => e
-      LOGGER.warn do
-        "Failed to update github with: [#{status}] #{description} - due to: #{e.class} #{e.message}"
-      end
+  class Notification
+    include Singleton
+    include Observable
+
+    def self.add_observer(*args)
+      instance.add_observer(*args)
     end
 
-    private
+    def self.update(*args)
+      instance.update(*args)
+    end
 
-    def github
-      @github_client ||= Octokit::Client.new(access_token: ENV.fetch("GITHUB_TOKEN"))
+    def update(status, description, deploy)
+      changed
+      notify_observers(status, description, deploy)
     end
   end
 end
