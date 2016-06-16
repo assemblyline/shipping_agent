@@ -7,6 +7,10 @@ RSpec.describe ShippingAgent::Notification do
     let(:observer)         { double(:observer, update: nil) }
     let(:other_observer)   { double(:observer, update: nil) }
 
+    before do
+      described_class.instance.delete_observers
+    end
+
     it "notifies interested observers" do
       described_class.add_observer(observer)
       described_class.add_observer(other_observer)
