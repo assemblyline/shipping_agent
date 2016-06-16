@@ -11,15 +11,18 @@ module ShippingAgent
       @namespace    = info[:namespace]
       @url          = info[:deployment_url]
       @poll_speed   = info[:poll_speed] || 0.5
+      @creator      = info[:creator]
+      @description  = info[:description]
     end
 
-    attr_reader :app, :image, :labels, :namespace, :url
+    attr_reader :app, :image, :labels, :namespace, :url, :creator, :description
 
     def self.deploy(info)
       new(info).apply
     end
 
     def apply
+      Notification.update("request", "Deployment of `#{app}` to `#{namespace}` was requested", self)
       deployments.each do |deployment|
         K8s.patch_deployment(
           name: deployment,

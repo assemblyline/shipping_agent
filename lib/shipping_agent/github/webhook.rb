@@ -24,7 +24,7 @@ module ShippingAgent
 
         case env["HTTP_X_GITHUB_EVENT"]
         when "deployment"
-          deploy(deployment_params(body))
+          deploy(body)
         when "ping"
           "200"
         when nil
@@ -34,9 +34,11 @@ module ShippingAgent
         end
       end
 
-      def deploy(params)
+      def deploy(body)
+        params = deployment_params(body)
         return "400" if params.nil? || invalid?(params)
         LOGGER.debug { "deployment params: #{params.inspect}" }
+
         ShippingAgent::Deploy.deploy(params)
         "202"
       end
@@ -60,9 +62,13 @@ module ShippingAgent
           app:            image.split("/").last.split(":").first,
           labels:         labels(deployment),
           deployment_url: deployment["url"],
+          creator:        deployment["creator"],
+          description:    deployment["description"],
         }
 
-      rescue # rubocop:disable Lint/HandleExceptions
+      rescue => e
+        LOGGER.warn { "deployment params could not be unpacked: #{e}" }
+        nil
       end
 
       def invalid?(params)
