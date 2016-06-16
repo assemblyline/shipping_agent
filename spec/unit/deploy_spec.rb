@@ -14,6 +14,7 @@ RSpec.describe ShippingAgent::Deploy do
         deploy:    "github:1233456",
       },
       deployment_url: "https://github/deployment/1",
+      poll_speed: 0,
     }
   end
 

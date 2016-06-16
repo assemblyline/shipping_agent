@@ -5,11 +5,12 @@ require "shipping_agent/worker"
 module ShippingAgent
   class Deploy
     def initialize(info)
-      @app       = info[:app].tr("_", "-")
-      @image     = info[:image]
-      @labels    = info[:labels]
-      @namespace = info[:namespace]
-      @url       = info[:deployment_url]
+      @app          = info[:app].tr("_", "-")
+      @image        = info[:image]
+      @labels       = info[:labels]
+      @namespace    = info[:namespace]
+      @url          = info[:deployment_url]
+      @poll_speed   = info[:poll_speed] || 0.5
     end
 
     attr_reader :app, :image, :labels, :namespace, :url
@@ -52,7 +53,7 @@ module ShippingAgent
           Notification.update("success", "#{app} deployed sucessfully to #{namespace}", self)
           return
         end
-        sleep 0.5
+        sleep @poll_speed
       end
       Notification.update("error", "#{app} deploy to #{namespace} timed out", self)
     end
