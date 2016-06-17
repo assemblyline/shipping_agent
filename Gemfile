@@ -12,4 +12,5 @@ group :test do
   gem "bundler-audit"
   gem "webmock"
   gem "simplecov", require: false
+  gem "codeclimate-test-reporter", require: false
 end
