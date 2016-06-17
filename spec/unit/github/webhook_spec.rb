@@ -94,13 +94,15 @@ RSpec.describe ShippingAgent::Github::Webhook do
             payload: {
               image: "quay.io/reevoo/#{app_name}:#{sha}_#{build}",
             },
+            creator: { login: "errm" },
+            description: "My Awesome Deploy",
           }
         end
         let(:body) { JSON.dump(deployment: deployment) }
 
         before { header "X-GitHub-Event", "deployment" }
 
-        it "notifies the deployer" do
+        it "initiates the deploy" do
           expect(ShippingAgent::Deploy).to receive(:deploy).with(
             namespace: namespace,
             image: "quay.io/reevoo/#{app_name}:#{sha}_#{build}",
@@ -111,6 +113,8 @@ RSpec.describe ShippingAgent::Github::Webhook do
               version:    sha,
             },
             deployment_url: url,
+            creator: { "login" => "errm" },
+            description: "My Awesome Deploy",
           )
           post "/", body
           expect(last_response).to be_accepted

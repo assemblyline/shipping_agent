@@ -14,6 +14,7 @@ RSpec.describe ShippingAgent::Deploy do
         deploy:    "github:1233456",
       },
       deployment_url: "https://github/deployment/1",
+      poll_speed: 0,
     }
   end
 
@@ -79,6 +80,22 @@ RSpec.describe ShippingAgent::Deploy do
       end.twice
 
       subject.apply
+    end
+
+    context "something goes wrong" do
+      it "notifies the error" do
+        allow(ShippingAgent::K8s).to receive(:patch_deployment).and_raise("K8s is broken")
+        expect(ShippingAgent::Notification).to receive(:update)
+          .with(
+            "error",
+            "shipping-agent deployment failed with: K8s is broken",
+            subject,
+          )
+        expect(ShippingAgent::LOGGER).to receive(:error) do |_args, &block|
+          expect(block.call).to eq("shipping-agent deployment failed: K8s is broken")
+        end
+        expect { subject.apply }.to raise_error "K8s is broken"
+      end
     end
   end
 

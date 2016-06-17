@@ -5,7 +5,10 @@ require "shipping_agent/notification"
 module ShippingAgent
   module Github
     class Notification
+      SUPPORTED_STATUSES = %w(pending success error inactive)
+
       def update(status, description, deploy)
+        return unless SUPPORTED_STATUSES.include?(status)
         github.create_deployment_status(
           deploy.url,
           status,

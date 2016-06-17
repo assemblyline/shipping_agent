@@ -2,6 +2,7 @@ source "https://rubygems.org"
 
 gem "puma"
 gem "octokit"
+gem "slack-ruby-client"
 
 group :test do
   gem "pry"

@@ -120,4 +120,11 @@ RSpec.describe ShippingAgent::Github::Notification do
       )
     end
   end
+
+  context "when github does not support the status" do
+    it "does nothing" do
+      expect(github).to_not receive(:create_deployment_status)
+      subject.update("requested", "some text", double)
+    end
+  end
 end

@@ -5,20 +5,45 @@ require "shipping_agent/worker"
 module ShippingAgent
   class Deploy
     def initialize(info)
-      @app       = info[:app].tr("_", "-")
-      @image     = info[:image]
-      @labels    = info[:labels]
-      @namespace = info[:namespace]
-      @url       = info[:deployment_url]
+      @app          = info[:app].tr("_", "-")
+      @image        = info[:image]
+      @labels       = info[:labels]
+      @namespace    = info[:namespace]
+      @url          = info[:deployment_url]
+      @poll_speed   = info[:poll_speed] || 0.5
+      @creator      = info[:creator]
+      @description  = info[:description]
     end
 
-    attr_reader :app, :image, :labels, :namespace, :url
+    attr_reader :app, :image, :labels, :namespace, :url, :creator, :description
 
     def self.deploy(info)
       new(info).apply
     end
 
     def apply
+      Notification.update("request", "Deployment of `#{app}` to `#{namespace}` was requested", self)
+      patch_k8s
+      Worker.work(-> { notify_when_complete })
+    rescue => error
+      handle(error)
+    end
+
+    def notify_when_complete
+      check_until = Time.now + ENV.fetch("DEPLOY_TIMEOUT", "300").to_i
+      until Time.now >= check_until
+        if complete?
+          Notification.update("success", "#{app} deployed sucessfully to #{namespace}", self)
+          return
+        end
+        sleep @poll_speed
+      end
+      Notification.update("error", "#{app} deploy to #{namespace} timed out", self)
+    end
+
+    private
+
+    def patch_k8s
       deployments.each do |deployment|
         K8s.patch_deployment(
           name: deployment,
@@ -42,22 +67,13 @@ module ShippingAgent
         )
         Notification.update("pending", "Config for #{deployment} pushed to kubernetes", self)
       end
-      Worker.work(-> { notify_when_complete })
     end
 
-    def notify_when_complete
-      check_until = Time.now + ENV.fetch("DEPLOY_TIMEOUT", "300").to_i
-      until Time.now >= check_until
-        if complete?
-          Notification.update("success", "#{app} deployed sucessfully to #{namespace}", self)
-          return
-        end
-        sleep 0.5
-      end
-      Notification.update("error", "#{app} deploy to #{namespace} timed out", self)
+    def handle(error)
+      LOGGER.error { "#{app} deployment failed: #{error}" }
+      Notification.update("error", "#{app} deployment failed with: #{error}", self)
+      fail error
     end
-
-    private
 
     def complete?
       deployments.all? { |name| update_complete?(name) }
