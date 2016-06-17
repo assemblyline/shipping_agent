@@ -12,6 +12,8 @@ SimpleCov.start
 require "pry"
 require "webmock/rspec"
 
+WebMock.disable_net_connect!(allow: "codeclimate.com")
+
 ENV["RACK_ENV"] ||= "test"
 
 RSpec.configure do |config|
