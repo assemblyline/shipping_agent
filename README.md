@@ -2,6 +2,8 @@
 ## Shipping Agent
 
 [![Build Status](https://travis-ci.org/assemblyline/shipping_agent.svg?branch=master)](https://travis-ci.org/assemblyline/shipping_agent)
+[![Code Climate](https://codeclimate.com/github/assemblyline/shipping_agent/badges/gpa.svg)](https://codeclimate.com/github/assemblyline/shipping_agent)
+[![Test Coverage](https://codeclimate.com/github/assemblyline/shipping_agent/badges/coverage.svg)](https://codeclimate.com/github/assemblyline/shipping_agent/coverage)
 
 Shipping Agent listens for Github Deployment Events on a Webhook, and updates Kubernetes to deploy new code.
 While the update of the deployment is in progress Shipping Agent adds Github Deployment statuses to
