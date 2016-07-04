@@ -44,6 +44,7 @@ RSpec.describe ShippingAgent::Slack::Notification do
       allow(Slack::Web::Client).to receive(:new).with(token: token).and_return(slack)
 
       expected_attachment = {
+        fallback: "the deploy is in progress",
         text: "the deploy is in progress",
         color: "warning",
         ts: Time.now.to_i,
@@ -66,6 +67,7 @@ RSpec.describe ShippingAgent::Slack::Notification do
         allow(Slack::Web::Client).to receive(:new).with(token: token).and_return(slack)
 
         expected_attachment = {
+          fallback: "a deploy was requested",
           title: "Make This Awesomes",
           text: "a deploy was requested",
           author_icon: "https://avatars1.githubusercontent.com/u/115280",
@@ -94,6 +96,7 @@ RSpec.describe ShippingAgent::Slack::Notification do
         allow(Slack::Web::Client).to receive(:new).with(token: token).and_return(slack)
 
         expected_attachment = {
+          fallback: "the deploy was successful",
           text: "the deploy was successful",
           color: "good",
           ts: Time.now.to_i,
@@ -117,6 +120,7 @@ RSpec.describe ShippingAgent::Slack::Notification do
         allow(Slack::Web::Client).to receive(:new).with(token: token).and_return(slack)
 
         expected_attachment = {
+          fallback: "the deploy was broken",
           text: "the deploy was broken",
           color: "danger",
           ts: Time.now.to_i,
