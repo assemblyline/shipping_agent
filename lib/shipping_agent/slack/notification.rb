@@ -43,6 +43,7 @@ module ShippingAgent
 
         def to_hash
           {
+            fallback: description,
             text: description,
             color: color,
             ts: Time.now.to_i,
