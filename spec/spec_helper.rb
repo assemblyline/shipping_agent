@@ -1,18 +1,12 @@
 require "simplecov"
-require "codeclimate-test-reporter"
 
-SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[
-  SimpleCov::Formatter::HTMLFormatter,
-  CodeClimate::TestReporter::Formatter
-]
+SimpleCov.formatter = SimpleCov::Formatter::HTMLFormatter
 SimpleCov.minimum_coverage 99
 SimpleCov.minimum_coverage_by_file 95
 SimpleCov.start
 
 require "pry"
 require "webmock/rspec"
-
-WebMock.disable_net_connect!(allow: "codeclimate.com")
 
 ENV["RACK_ENV"] ||= "test"
 

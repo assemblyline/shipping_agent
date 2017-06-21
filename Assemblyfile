@@ -4,6 +4,3 @@ repo = 'quay.io/assemblyline/shipping_agent'
 
 [build]
 builder = 'ruby'
-
-[build.env]
-CODECLIMATE_REPO_TOKEN = '4c594aaa56e3733a729803e20ff047acc81caa88878f0d4f0b0d617ecbc276da'
