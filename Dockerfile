@@ -22,6 +22,7 @@ RUN apk add --no-cache --virtual .builddeps \
         ruby$(cat .ruby-version) \
         ca-certificates \
         bash \
+        openssl \
     && apk del --no-cache .builddeps
 
 COPY . .

@@ -3,6 +3,7 @@ source "https://rubygems.org"
 gem "puma"
 gem "octokit"
 gem "slack-ruby-client"
+gem "dogstatsd-ruby"
 
 group :test do
   gem "pry"
