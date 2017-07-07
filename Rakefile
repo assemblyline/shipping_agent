@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "reevoocop/rake_task"
 require "rspec/core/rake_task"
 require "bundler/audit/task"

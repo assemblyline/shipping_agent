@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "datadog/statsd"
 require "shipping_agent/logger"
 require "shipping_agent/notification"
@@ -5,7 +6,7 @@ require "shipping_agent/notification"
 module ShippingAgent
   module Datadog
     class DeployNotification
-      DEFAULT_STATSD_URL = "udp://localhost:8125".freeze
+      DEFAULT_STATSD_URL = "udp://localhost:8125"
 
       def update(status, description, deploy)
         return unless status == "success"

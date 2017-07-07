@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "feature_helper"
 require "shipping_agent/github/webhook"
 require "openssl"

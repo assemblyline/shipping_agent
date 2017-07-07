@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "shipping_agent/k8s"
 require "shipping_agent/notification"
 require "shipping_agent/worker"
@@ -88,8 +89,8 @@ module ShippingAgent
 
     def update_complete?(name)
       K8s.deployment(namespace: namespace, name: name)["status"]
-        .values_at("replicas", "updatedReplicas", "availableReplicas")
-        .uniq.size == 1
+         .values_at("replicas", "updatedReplicas", "availableReplicas")
+         .uniq.size == 1
     end
   end
 end
