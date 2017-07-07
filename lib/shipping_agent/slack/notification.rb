@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "slack-ruby-client"
 require "shipping_agent/logger"
 require "shipping_agent/notification"

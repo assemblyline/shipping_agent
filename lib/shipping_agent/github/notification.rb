@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "octokit"
 require "shipping_agent/logger"
 require "shipping_agent/notification"
@@ -5,7 +6,7 @@ require "shipping_agent/notification"
 module ShippingAgent
   module Github
     class Notification
-      SUPPORTED_STATUSES = %w(pending success error inactive)
+      SUPPORTED_STATUSES = %w(pending success error inactive).freeze
 
       def update(status, description, deploy)
         return unless SUPPORTED_STATUSES.include?(status)

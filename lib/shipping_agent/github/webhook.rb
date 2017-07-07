@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "openssl"
 require "json"
 require "shipping_agent/deploy"
@@ -65,14 +66,13 @@ module ShippingAgent
           creator:        deployment["creator"],
           description:    deployment["description"],
         }
-
       rescue => e
         LOGGER.warn { "deployment params could not be unpacked: #{e}" }
         nil
       end
 
       def invalid?(params)
-        [:namespace, :image, :labels].any? { |p| params[p].nil? }
+        %i[namespace image labels].any? { |p| params[p].nil? }
       end
 
       def labels(deployment)

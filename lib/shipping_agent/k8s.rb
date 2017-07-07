@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "net/http"
 require "json"
 require "uri"
@@ -74,7 +75,7 @@ module ShippingAgent
     end
 
     def headers(request)
-      request["Accept"]        =  "application/json"
+      request["Accept"]        = "application/json"
       request["Authorization"] = "Bearer #{bearer_token}"
       request["Content-Type"]  = "application/strategic-merge-patch+json" if request.is_a? Net::HTTP::Patch
     end

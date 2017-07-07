@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "spec_helper"
 require "shipping_agent/deploy"
 
@@ -22,9 +23,9 @@ RSpec.describe ShippingAgent::Deploy do
     allow(ShippingAgent::K8s).to receive(:deployments)
       .with(namespace: "assemblyline", selector: { app: "shipping-agent" })
       .and_return([
-        { "metadata" => { "name" => "shipping-agent-api" } },
-        { "metadata" => { "name" => "shipping-agent-worker" } },
-      ])
+                    { "metadata" => { "name" => "shipping-agent-api" } },
+                    { "metadata" => { "name" => "shipping-agent-worker" } },
+                  ])
     allow(ShippingAgent::Notification).to receive(:update)
     allow(ShippingAgent::K8s).to receive(:patch_deployment)
   end
