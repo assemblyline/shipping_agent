@@ -4,6 +4,7 @@ gem "puma"
 gem "octokit"
 gem "slack-ruby-client"
 gem "dogstatsd-ruby"
+gem "mini_cache"
 
 group :test do
   gem "pry"
